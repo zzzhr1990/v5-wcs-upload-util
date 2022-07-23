@@ -220,7 +220,7 @@ func UploadFileConcurrent(auth *utility.Auth, config *core.Config, client *http.
 		return nil, errors.New("makeFile failed, " + err.Error())
 	}
 	if http.StatusOK != response.StatusCode {
-		return serverResponse, errors.New("makeFile failed, response code is " + strconv.Itoa(response.StatusCode) + ", response body is " + result2.Message)
+		return serverResponse, errors.New("makeFile failed, response code is " + strconv.Itoa(response.StatusCode) + ", response body is " + serverResponse.Message)
 	}
 
 	return serverResponse, nil
