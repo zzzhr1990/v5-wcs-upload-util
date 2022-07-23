@@ -212,16 +212,18 @@ func UploadFileConcurrent(auth *utility.Auth, config *core.Config, client *http.
 	}
 	defer response.Body.Close()
 	data, _ := ioutil.ReadAll(response.Body)
-	result2 := &model.MakeFileResponse{}
-	err = json.Unmarshal(data, result2)
+	serverResponse := &model.MakeFileResponse{}
+	err = json.Unmarshal(data, serverResponse)
 	if err != nil {
+		// if response is not a standard JSON, server response must be internal error
+		// it is unnecessary to detect server's response status (nginx may return 0)
 		return nil, errors.New("makeFile failed, " + err.Error())
 	}
 	if http.StatusOK != response.StatusCode {
-		return nil, errors.New("makeFile failed, response code is " + strconv.Itoa(response.StatusCode) + ", response body is " + result2.Message)
+		return serverResponse, errors.New("makeFile failed, response code is " + strconv.Itoa(response.StatusCode) + ", response body is " + result2.Message)
 	}
 
-	return result2, nil
+	return serverResponse, nil
 }
 
 func worker(s *core.SliceUpload, jobs <-chan *Jobs, results chan<- *Results, stop_flag *bool) {
